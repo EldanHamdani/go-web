@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      name: redis-deployment
+      labels:
+        app: redis
+        tier: data
+    spec:
+      containers:
+        - name: redis
+          image: "redis:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golang-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: golang-app
+  template:
+    metadata:
+      name: golang-app-deployment
+      labels:
+        app: golang-app
+        tier: data
+    spec:
+      containers:
+        - name: golang-app
+          image: "eldanhamdani123/my_repo:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+          env:
+            - name: "REDIS_URL"
+              value: "redis://$(EXAMPLE_DATA_TIER_SERVICE_HOST):$(EXAMPLE_DATA_TIER_SERVICE_PORT_REDIS)"
+
